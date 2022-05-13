@@ -1,4 +1,5 @@
 # Given a CSV file containing lat and lon, create a dotsol
+import shutil
 
 from dotsolmaker import DotSolMaker
 import pandas as pd
@@ -38,7 +39,7 @@ def create_static_dotsol(lon_lat_file, outputfile):
         dsm.get_dotsol()
 
     merge_all_dot_sol(tmp_sold, outputfile)
-    os.rmdir(tmp_sold)
+    shutil.rmtree(tmp_sold, )
     print(f"Created a static .SOL at : {outputfile}")
 
 
