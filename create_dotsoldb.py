@@ -5,8 +5,6 @@ import pandas as pd
 import glob
 import os
 
-working_dir = os.getcwd()
-
 def merge_all_dot_sol(outputs_dir, dot_sol_output):
     """
     Merge all .SOL into one
@@ -40,14 +38,19 @@ def create_static_dotsol(lon_lat_file, outputfile):
         dsm.get_dotsol()
 
     merge_all_dot_sol(tmp_sold, outputfile)
-    # os.rmdir(tmp_sold)
+    os.rmdir(tmp_sold)
     print(f"Created a static .SOL at : {outputfile}")
 
 
 
 # Example:
+working_dir = os.getcwd()
+
+## Update these two variables accordingly:
 lon_lat_file = f"{working_dir}/sample_lon_lat.csv"
 outputfile = f"{working_dir}/sample_dotsol.SOL"
+
+
 create_static_dotsol(lon_lat_file, outputfile)
 
 
