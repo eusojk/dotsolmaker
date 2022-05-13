@@ -130,15 +130,15 @@ class DotSolMaker(object):
         return data
 
     def get_dotsol_soilprop_sample(self):
-        # dict_summary = dict()
-        # for la in sorted(self.layers_aliases.keys()):
-        #     layer = self.layers_aliases.get(la)
-        #     dict_summary[la] = self.get_soilproperty_data_for_all_depths(layer)
+        dict_summary = dict()
+        for la in sorted(self.layers_aliases.keys()):
+            layer = self.layers_aliases.get(la)
+            dict_summary[la] = self.get_soilproperty_data_for_all_depths(layer)
         # print(dict_summary)
-        dict_summary = {'bulkdensity': [147.61, 149.2, 149.31, 150.62, 151.78, 153.12],
-                        'clay': [152.0, 149.3, 165.81, 171.28, 175.36, 174.38],
-                        'organicsoil': [48.78, 32.42, 29.53, 24.16, 22.39, 26.31],
-                        'sandfraction': [717.47, 726.42, 712.47, 706.22, 703.72, 710.81]}
+        # dict_summary = {'bulkdensity': [147.61, 149.2, 149.31, 150.62, 151.78, 153.12],
+        #                 'clay': [152.0, 149.3, 165.81, 171.28, 175.36, 174.38],
+        #                 'organicsoil': [48.78, 32.42, 29.53, 24.16, 22.39, 26.31],
+        #                 'sandfraction': [717.47, 726.42, 712.47, 706.22, 703.72, 710.81]}
 
         df_summary = pd.DataFrame.from_dict(dict_summary)
         df_summary['bulkdensity'] = round(df_summary['bulkdensity'] / 100, 2)
