@@ -143,6 +143,9 @@ class DotSolMaker(object):
         df_summary = pd.DataFrame.from_dict(dict_summary)
         df_summary['bulkdensity'] = round(df_summary['bulkdensity'] / 100, 2)
         df_summary = round(df_summary, 2)
+        df_summary['clay'] = round(df_summary['clay'] / 10, 2)
+        df_summary['organicsoil'] = round(df_summary['organicsoil'] / 10, 2)
+        df_summary['sandfraction'] = round(df_summary['sandfraction'] / 10, 2)
         df_summary['Latitude'] = self.lat
         df_summary['Longitude'] = self.lon
         df_summary['Depth'] = self.depth
