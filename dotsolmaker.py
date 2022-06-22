@@ -15,8 +15,8 @@ class DotSolMaker(object):
 
     def __init__(self, lon, lat, fext='SOL', dotsol_folder=None):
         self.depth = 600
-        self.lat = lat
-        self.lon = lon
+        self.lat = round(lat, 3)
+        self.lon = round(lon, 3)
         self.geohashed = self.geohash_convert(self.lat, self.lon)
         self.crs = 'urn:ogc:def:crs:EPSG::4326'
         self.win_size = 8
