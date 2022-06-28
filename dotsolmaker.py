@@ -86,6 +86,9 @@ class DotSolMaker(object):
         return pgh.decode(geohashed)
 
     def download_soilproperty(self, layer, depth_range):
+
+        os.makedirs(self.tmp_folder, exist_ok=True)
+
         cover_id = f"{layer}_{depth_range[0]}-{depth_range[1]}cm_mean"
         outname_id = f"{layer}_{depth_range[1] - depth_range[0]}cm_mean"
         outname = f"{self.tmp_folder}{outname_id}.tif"
