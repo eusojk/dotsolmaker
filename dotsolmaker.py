@@ -9,6 +9,13 @@ import numpy as np
 import pandas as pd
 from glob import glob
 from shutil import copyfile, copyfileobj
+from requests import ReadTimeout, ConnectTimeout, HTTPError, ConnectionError
+# from requests import ReadTimeout, ConnectTimeout, HTTPError, Timeout, ConnectionError
+from retry import retry
+from urllib3 import Timeout
+
+
+ERROR_TYPES = (ReadTimeout, ConnectTimeout, HTTPError, Timeout, ConnectionError,)
 
 WGSA = 6378137.0  # Major semiaxis [m]
 WGSB = 6356752.3  # Minor semiaxis [m]
@@ -85,6 +92,21 @@ class DotSolMaker(object):
     def geohash_decode(self, geohashed, lat=None, lon=None):
         return pgh.decode(geohashed)
 
+    @retry(ERROR_TYPES, delay=5, tries=6)
+    def download_coverage(self, wcs, cover_id):
+        bbox = self.get_bounding_box()
+        try:
+            response = wcs.getCoverage(
+                identifier=cover_id,
+                crs=self.crs,
+                bbox=bbox,
+                width=self.win_size, height=self.win_size,
+                format='GEOTIFF_INT16')
+        except Exception as err:
+            print(err)
+            raise err
+        return response
+
     def download_soilproperty(self, layer, depth_range):
 
         os.makedirs(self.tmp_folder, exist_ok=True)
@@ -100,14 +122,15 @@ class DotSolMaker(object):
             print(f"Could not find a layer that matches: {cover_id}")
             return
 
-        bbox = self.get_bounding_box()
-
-        response = wcs.getCoverage(
-            identifier=cover_id,
-            crs=self.crs,
-            bbox=bbox,
-            width=self.win_size, height=self.win_size,
-            format='GEOTIFF_INT16')
+        # bbox = self.get_bounding_box()
+        #
+        # response = wcs.getCoverage(
+        #     identifier=cover_id,
+        #     crs=self.crs,
+        #     bbox=bbox,
+        #     width=self.win_size, height=self.win_size,
+        #     format='GEOTIFF_INT16')
+        response = self.download_coverage(wcs, cover_id)
 
         with open(outname, 'wb') as file:
             file.write(response.read())
