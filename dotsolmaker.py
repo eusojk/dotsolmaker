@@ -10,6 +10,8 @@ import pandas as pd
 from glob import glob
 from shutil import copyfile, copyfileobj
 
+WGSA = 6378137.0  # Major semiaxis [m]
+WGSB = 6356752.3  # Minor semiaxis [m]
 
 class DotSolMaker(object):
 
@@ -53,8 +55,8 @@ class DotSolMaker(object):
 
     @staticmethod
     def get_earth_radius(lat):
-        wgsa = 6378137.0  # Major semiaxis [m]
-        wgsb = 6356752.3  # Minor semiaxis [m]
+        wgsa = WGSA
+        wgsb = WGSB
 
         an = wgsa * wgsa * math.cos(lat)
         bn = wgsb * wgsb * math.sin(lat)
