@@ -45,7 +45,7 @@ def create_static_dotsol(lon_lat_file, outputfile):
 
     merge_all_dot_sol(tmp_sold, outputfile)
     shutil.rmtree(tmp_sold, )
-    print(f"Created a static .SOL at : {outputfile}")
+    print(f"Created a static .SOL at : {outputfile}\n")
 
 
 
@@ -56,7 +56,7 @@ working_dir = os.getcwd()
 lon_lat_file = f"{working_dir}/sample_lon_lat.csv"
 outputfile = f"{working_dir}/sample_dotsol.SOL"
 
-
-create_static_dotsol(lon_lat_file, outputfile)
+if __name__ == '__main__':
+    create_static_dotsol(lon_lat_file, outputfile)
 
 
