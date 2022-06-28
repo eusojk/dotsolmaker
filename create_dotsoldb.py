@@ -24,6 +24,11 @@ def merge_all_dot_sol(outputs_dir, dot_sol_output):
 
 
 def create_static_dotsol(lon_lat_file, outputfile):
+
+    if not os.path.exists(lon_lat_file):
+        print(f"{lon_lat_file} not found. Exiting...")
+        return
+
     tmp_sold = f"{os.getcwd()}/tmp_sold/"
     os.makedirs(tmp_sold, exist_ok=True)
 
