@@ -82,6 +82,9 @@ class DotSolMaker(object):
     def geohash_encode(self, lat, lon, length=10):
         return pgh.encode(latitude=self.lat, longitude=self.lon, precision=length)
 
+    def geohash_decode(self, geohashed, lat=None, lon=None):
+        return pgh.decode(geohashed)
+
     def download_soilproperty(self, layer, depth_range):
         cover_id = f"{layer}_{depth_range[0]}-{depth_range[1]}cm_mean"
         outname_id = f"{layer}_{depth_range[1] - depth_range[0]}cm_mean"
