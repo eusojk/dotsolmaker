@@ -10,10 +10,10 @@ import pandas as pd
 from glob import glob
 from shutil import copyfile, copyfileobj
 from requests import ReadTimeout, ConnectTimeout, HTTPError, ConnectionError
-# from requests import ReadTimeout, ConnectTimeout, HTTPError, Timeout, ConnectionError
+import time
 from retry import retry
 from urllib3 import Timeout
-
+import reverse_geocoder as rg
 
 ERROR_TYPES = (ReadTimeout, ConnectTimeout, HTTPError, Timeout, ConnectionError,)
 
@@ -26,6 +26,7 @@ class DotSolMaker(object):
         self.depth = 600
         self.lat = round(lat, 3)
         self.lon = round(lon, 3)
+        self.country = self.get_country()
         self.geohashed = self.geohash_encode(self.lat, self.lon)
         self.crs = 'urn:ogc:def:crs:EPSG::4326'
         self.win_size = 8
@@ -92,19 +93,27 @@ class DotSolMaker(object):
     def geohash_decode(self, geohashed, lat=None, lon=None):
         return pgh.decode(geohashed)
 
-    @retry(ERROR_TYPES, delay=5, tries=6)
-    def download_coverage(self, wcs, cover_id):
+    # @retry(ERROR_TYPES, delay=5, tries=6)
+    def download_coverage(self, wcs, cover_id, sleep_time=5):
         bbox = self.get_bounding_box()
-        try:
-            response = wcs.getCoverage(
-                identifier=cover_id,
-                crs=self.crs,
-                bbox=bbox,
-                width=self.win_size, height=self.win_size,
-                format='GEOTIFF_INT16')
-        except Exception as err:
-            print(err)
-            raise err
+        cnt = 1
+        while True:
+            try:
+                response = wcs.getCoverage(
+                    identifier=cover_id,
+                    crs=self.crs,
+                    bbox=bbox,
+                    width=self.win_size, height=self.win_size,
+                    format='GEOTIFF_INT16')
+                break
+            except Exception as err:
+                print(f"this error: {err} occured")
+                cnt += 1
+                print(f"Failure... waiting for {sleep_time} seconds before trying the {cnt} time.")
+                time.sleep(5)
+                continue
+                # raise err
+        # print(f"in downloading, cnt: {cnt}")
         return response
 
     def download_soilproperty(self, layer, depth_range):
@@ -122,14 +131,6 @@ class DotSolMaker(object):
             print(f"Could not find a layer that matches: {cover_id}")
             return
 
-        # bbox = self.get_bounding_box()
-        #
-        # response = wcs.getCoverage(
-        #     identifier=cover_id,
-        #     crs=self.crs,
-        #     bbox=bbox,
-        #     width=self.win_size, height=self.win_size,
-        #     format='GEOTIFF_INT16')
         response = self.download_coverage(wcs, cover_id)
 
         with open(outname, 'wb') as file:
@@ -258,9 +259,14 @@ class DotSolMaker(object):
         sol_file = self.thsol_tmp_path
         from_file = open(sol_file)
         hline = from_file.readline()
-        hline_new = "*" + self.geohashed + hline[12:]
+        header1 = "*" + self.geohashed + '    ' + self.country + hline[18:]
+        header2 = from_file.readline()
+        hline = from_file.readline()
+        header3 = hline[:18] + self.country + hline[20:]
         with open(sol_file, mode="w") as to_file:
-            to_file.write(hline_new)
+            to_file.write(header1)
+            to_file.write(header2)
+            to_file.write(header3)
             copyfileobj(from_file, to_file)
         from_file.close()
 
@@ -281,6 +287,12 @@ class DotSolMaker(object):
         print(
             f"Created a .SOL for (lon: {self.lon}, lat:{self.lat}) with geohashed value: {self.geohashed} at: {self.dotsoloutput}")
 
+    def get_country(self):
+        res = rg.search((self.lat, self.lon))
+        cc = res[0].get('cc', '')
+        if cc == '':
+            return '-99'
+        return f"{cc} "
 
 ## Test
 # b = DotSolMaker(lon=-15.657, lat=16.107, fext='SOLD')
