@@ -19,7 +19,7 @@ class DotSolMaker(object):
         self.depth = 600
         self.lat = round(lat, 3)
         self.lon = round(lon, 3)
-        self.geohashed = self.geohash_convert(self.lat, self.lon)
+        self.geohashed = self.geohash_encode(self.lat, self.lon)
         self.crs = 'urn:ogc:def:crs:EPSG::4326'
         self.win_size = 8
         self.layers_aliases = {'bulkdensity': 'bdod', 'clay': 'clay', 'organicsoil': 'soc', 'sandfraction': 'sand'}
@@ -79,7 +79,7 @@ class DotSolMaker(object):
         TRAN_4326_TO_3857 = Transformer.from_crs("EPSG:4326", "EPSG:3857", always_xy=True)
         return TRAN_4326_TO_3857.transform(lon, lat)
 
-    def geohash_convert(self, lat, lon, length=10):
+    def geohash_encode(self, lat, lon, length=10):
         return pgh.encode(latitude=self.lat, longitude=self.lon, precision=length)
 
     def download_soilproperty(self, layer, depth_range):
